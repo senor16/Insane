@@ -14,11 +14,11 @@ namespace BCEngine
         private Song music;
         private SoundEffect sfxExplode;
 
-        private Rectangle Screen,World;
+        private Rectangle World;
 
         private Hero MyHero;
         private Texture2D Background;
-        
+
 
 
         public SceneGameplay(MainGame pGame) : base(pGame)
@@ -28,19 +28,27 @@ namespace BCEngine
 
         public override void Load()
         {
-            Screen = mainGame.Window.ClientBounds;
-            World.Width=100;
-            World.Height = Screen.Height;
-            
-            Debug.WriteLine("w : "+Screen.Width+", h : "+Screen.Height);
+
+            World.Width = 100;
+            World.Height = mainGame.Screen.Height;
+
+            Debug.WriteLine("w : " + mainGame.Screen.Width + ", h : " + mainGame.Screen.Height);
             // Input state
             oldKBState = Keyboard.GetState();
             oldPadState = GamePad.GetState(PlayerIndex.One);
 
             // Ship
-            AssetManager.LoadTexture2D(mainGame.Content, "R1_idle_000");
-            MyHero = new Hero(AssetManager.GetTexture2D("R1_idle_000"));
-            MyHero.Position = new Vector2(40, Screen.Height  - MyHero.Texture.Height-20);
+            // Anims
+            Anim HeroIdle = new Anim("idle", 10, true);
+            for (int i = 0; i < 9; i++)
+            {
+                AssetManager.LoadTexture2D(mainGame.Content,"Robot_1/R1_Idle/idle_00"+i);
+                HeroIdle.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Idle/idle_00"+i));
+            }
+            MyHero = new Hero();
+            MyHero.addAnim(HeroIdle);
+            MyHero.currentAnim = MyHero.ListAnim[0];
+            MyHero.Position = new Vector2(40, mainGame.Screen.Height - MyHero.Texture.Height - 20);
             listActor.Add(MyHero);
 
             // Meteors
@@ -48,7 +56,7 @@ namespace BCEngine
             // for (int i = 0; i < 10; i++)
             // {
             //     Meteor m = new Meteor(AssetManager.GetTexture2D("meteor"));
-            //     m.Position = new Vector2(Util.GetInt(1, Screen.Width - m.Texture.Width), Util.GetInt(1, Screen.Height - m.Texture.Height));
+            //     m.Position = new Vector2(Util.GetInt(1, mainGame.Screen.Width - m.Texture.Width), Util.GetInt(1, mainGame.Screen.Height - m.Texture.Height));
             //     listActor.Add(m);
             // }
 
@@ -63,7 +71,7 @@ namespace BCEngine
             // sfxExplode = AssetManager.GetSoundEffect("explode");
 
             // Background
-            AssetManager.LoadTexture2D(mainGame.Content,"War2");
+            AssetManager.LoadTexture2D(mainGame.Content, "War2");
             Background = AssetManager.GetTexture2D("War2");
 
 
@@ -93,7 +101,7 @@ namespace BCEngine
             if (capabilities.IsConnected)
             {
                 GamePadState newPadState = GamePad.GetState(PlayerIndex.One, GamePadDeadZone.IndependentAxes);
-                if (newPadState.IsButtonDown(Buttons.LeftThumbstickLeft) )
+                if (newPadState.IsButtonDown(Buttons.LeftThumbstickLeft))
                 {
                     MyHero.Move(3 * -1, 3 * 0);
                 }
@@ -149,11 +157,11 @@ namespace BCEngine
             KeyboardState newKBState = Keyboard.GetState();
 
             // Move the ship
-            if ((newKBState.IsKeyDown(Keys.Left) || newKBState.IsKeyDown(Keys.A)) && MyHero.Position.X >0)
+            if ((newKBState.IsKeyDown(Keys.Left) || newKBState.IsKeyDown(Keys.A)) && MyHero.Position.X > 0)
             {
                 MyHero.Move(3 * -1, 3 * 0);
             }
-            if ((newKBState.IsKeyDown(Keys.Down) || newKBState.IsKeyDown(Keys.S)) && MyHero.Position.Y<World.Height-MyHero.Texture.Height)
+            if ((newKBState.IsKeyDown(Keys.Down) || newKBState.IsKeyDown(Keys.S)) && MyHero.Position.Y < World.Height - MyHero.Texture.Height)
             {
                 MyHero.Move(3 * 0, 3 * 1);
             }
@@ -161,7 +169,7 @@ namespace BCEngine
             {
                 MyHero.Move(3 * 1, 3 * 0);
             }
-            if ((newKBState.IsKeyDown(Keys.Up) || newKBState.IsKeyDown(Keys.W)) && MyHero.Position.Y>0)
+            if ((newKBState.IsKeyDown(Keys.Up) || newKBState.IsKeyDown(Keys.W)) && MyHero.Position.Y > 0)
             {
                 MyHero.Move(3 * 0, 3 * -1);
             }
@@ -190,9 +198,9 @@ namespace BCEngine
                         m.Position = new Vector2(0, m.Position.Y);
                         m.vx = -m.vx;
                     }
-                    if (m.Position.X > Screen.Width - m.Texture.Width)
+                    if (m.Position.X > mainGame.Screen.Width - m.Texture.Width)
                     {
-                        m.Position = new Vector2(Screen.Width - m.Texture.Width, m.Position.Y);
+                        m.Position = new Vector2(mainGame.Screen.Width - m.Texture.Width, m.Position.Y);
                         m.vx = -m.vx;
                     }
                     if (m.Position.Y < 0)
@@ -202,9 +210,9 @@ namespace BCEngine
 
                     }
 
-                    if (m.Position.Y > Screen.Height - m.Texture.Height)
+                    if (m.Position.Y > mainGame.Screen.Height - m.Texture.Height)
                     {
-                        m.Position = new Vector2(m.Position.X, Screen.Height - m.Texture.Height);
+                        m.Position = new Vector2(m.Position.X, mainGame.Screen.Height - m.Texture.Height);
                         m.vy = -m.vy;
                     }
                     if (Util.CollideByBox(m, MyHero))
@@ -236,7 +244,7 @@ namespace BCEngine
         {
             // Debug.WriteLine("Drawing Scene Gameplay...");
             mainGame.spriteBatch.Begin();
-            mainGame.spriteBatch.Draw(Background,Vector2.Zero,Color.White);
+            mainGame.spriteBatch.Draw(Background, Vector2.Zero, Color.White);
             mainGame.spriteBatch.DrawString(AssetManager.MainFont, "Ship Energy : " + MyHero.Energy, new Vector2(20, 50), Color.Wheat);
             mainGame.spriteBatch.DrawString(AssetManager.MainFont, "This is the Gameplay", new Vector2(100, 10), Color.Red);
 

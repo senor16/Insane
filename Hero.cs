@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 public class Hero : Sprite{
     public int Energy;
 
-    public Hero(Texture2D pTexture) : base(pTexture)
+    public Hero() : base()
     {
         Energy=100;
     }
@@ -13,5 +13,12 @@ public class Hero : Sprite{
         if(pBy is Meteor){
             Energy-=10;
         }
+    }
+
+    
+
+    public override void Draw(SpriteBatch pSpriteBatch)
+    {
+        base.Draw(pSpriteBatch);
     }
 }

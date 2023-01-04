@@ -9,10 +9,18 @@ public class MainGame : Game
     GraphicsDeviceManager graphics;
     public SpriteBatch spriteBatch;
     public GameState gameState;
+    public Rectangle Screen;
 
     public MainGame()
     {
         graphics = new GraphicsDeviceManager(this);
+        graphics.PreferredBackBufferHeight=450;
+        graphics.PreferredBackBufferWidth=800;
+        graphics.ApplyChanges();        
+        Screen = new Rectangle();
+        Screen.Width = graphics.PreferredBackBufferWidth;
+        Screen.Height = graphics.PreferredBackBufferHeight;
+        
         Content.RootDirectory = "Content";
         IsMouseVisible = true;        
         gameState = new BCEngine.GameState(this);
