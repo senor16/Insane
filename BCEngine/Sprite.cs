@@ -12,17 +12,22 @@ public class Sprite : IActor
 
     public Texture2D Texture { get; set; }
     public List<Anim> ListAnim { get; set; }
-    public Anim currentAnim {get;set;}
+    public Anim currentAnim { get; set; }
     public float vx { get; set; }
     public float vy { get; set; }
     public bool ToRemove { get; set; }
+
+    public SpriteEffects effect { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
 
     public Sprite()
     {
         Texture = null;
         ListAnim = new List<Anim>();
-        currentAnim=null;
+        currentAnim = null;
         ToRemove = false;
+        effect = SpriteEffects.None;
     }
 
     public void addAnim(Anim pAnim)
@@ -36,21 +41,51 @@ public class Sprite : IActor
 
     public virtual void Update(GameTime gameTime)
     {
-        if (currentAnim!=null)
-            currentAnim.Update();   
+        if (currentAnim != null)
+        {
+            currentAnim.Update();
+            if (Width != currentAnim.frames[currentAnim.currentFrame].Width)
+                Width = currentAnim.frames[currentAnim.currentFrame].Width;
+
+            if (Height != currentAnim.frames[currentAnim.currentFrame].Height)
+                Height = currentAnim.frames[currentAnim.currentFrame].Height;
+
+        }
+        else
+        {
+            Width = Texture.Width;
+            Height = Texture.Height;
+        }
         Move(vx, vy);
-        BoundingBox = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+        BoundingBox = new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+
     }
 
     public virtual void Draw(SpriteBatch pSpriteBatch)
     {
         pSpriteBatch.Begin();
-        if (currentAnim==null)
+        if (currentAnim == null)
             pSpriteBatch.Draw(Texture, Position, Color.White);
-        else{
-            pSpriteBatch.Draw(currentAnim.frames[currentAnim.currentFrame],Position,Color.White);
+        else
+        {
+            pSpriteBatch.Draw(currentAnim.frames[currentAnim.currentFrame], Position, null, Color.White, 0, Vector2.Zero, 1.0f, effect, 0);
         }
         pSpriteBatch.End();
+    }
+
+    public void playAnim(string pName)
+    {
+        if (currentAnim==null || (currentAnim!=null && currentAnim.name != pName))
+        {
+            foreach (Anim anim in ListAnim)
+            {
+                if (anim.name == pName)
+                {
+                    currentAnim = anim;
+                    anim.reset();
+                }
+            }
+        }
     }
 
     public virtual void TouchedBy(IActor pBy)

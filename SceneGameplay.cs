@@ -13,7 +13,7 @@ namespace BCEngine
         private GamePadState oldPadState;
         private Song music;
         private SoundEffect sfxExplode;
-
+        private PlayerInput playerInput;
         private Rectangle World;
 
         private Hero MyHero;
@@ -29,7 +29,7 @@ namespace BCEngine
         public override void Load()
         {
 
-            World.Width = 100;
+            World.Width = 1000;
             World.Height = mainGame.Screen.Height;
 
             Debug.WriteLine("w : " + mainGame.Screen.Width + ", h : " + mainGame.Screen.Height);
@@ -37,20 +37,41 @@ namespace BCEngine
             oldKBState = Keyboard.GetState();
             oldPadState = GamePad.GetState(PlayerIndex.One);
 
-            // Ship
-            // Anims
+            // Hero
+            // Anim Idle
             Anim HeroIdle = new Anim("idle", 10, true);
             for (int i = 0; i < 9; i++)
             {
-                AssetManager.LoadTexture2D(mainGame.Content,"Robot_1/R1_Idle/idle_00"+i);
-                HeroIdle.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Idle/idle_00"+i));
+                AssetManager.LoadTexture2D(mainGame.Content, "Robot_1/R1_Idle/idle_00" + i);
+                HeroIdle.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Idle/idle_00" + i));
             }
-            MyHero = new Hero();
-            MyHero.addAnim(HeroIdle);
-            MyHero.currentAnim = MyHero.ListAnim[0];
-            MyHero.Position = new Vector2(40, mainGame.Screen.Height - MyHero.Texture.Height - 20);
-            listActor.Add(MyHero);
 
+            // Anim Run
+            Anim HeroRun = new Anim("Run", 10, true);
+            for (int i = 0; i < 12; i++)
+            {
+                if (i < 10)
+                {
+
+                    AssetManager.LoadTexture2D(mainGame.Content, "Robot_1/R1_Run/Run_00" + i);
+                    HeroRun.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Run/Run_00" + i));
+                }
+                else
+                {
+                    AssetManager.LoadTexture2D(mainGame.Content, "Robot_1/R1_Run/Run_0" + i);
+                    HeroRun.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Run/Run_0" + i));
+                }
+            }
+
+
+            MyHero = new Hero();
+            MyHero.Height = AssetManager.GetTexture2D("Robot_1/R1_Run/Run_000").Height;
+            MyHero.addAnim(HeroIdle);
+            MyHero.addAnim(HeroRun);
+            MyHero.playAnim("idle");
+            MyHero.Position = new Vector2(40, mainGame.Screen.Height - MyHero.Height - 20);
+            listActor.Add(MyHero);
+            playerInput = new PlayerInput();
             // Meteors
             // AssetManager.LoadTexture2D(mainGame.Content, "meteor");
             // for (int i = 0; i < 10; i++)
@@ -96,83 +117,41 @@ namespace BCEngine
             /**
                 Controlls
             */
+            playerInput.reset();
             // Pad
             GamePadCapabilities capabilities = GamePad.GetCapabilities(PlayerIndex.One);
             if (capabilities.IsConnected)
             {
                 GamePadState newPadState = GamePad.GetState(PlayerIndex.One, GamePadDeadZone.IndependentAxes);
-                if (newPadState.IsButtonDown(Buttons.LeftThumbstickLeft))
-                {
-                    MyHero.Move(3 * -1, 3 * 0);
-                }
-                if (newPadState.IsButtonDown(Buttons.LeftThumbstickDown))
-                {
-                    MyHero.Move(3 * 0, 3 * 1);
-                }
-                if (newPadState.IsButtonDown(Buttons.LeftThumbstickRight))
-                {
-                    MyHero.Move(3 * 1, 3 * 0);
-                }
-                if (newPadState.IsButtonDown(Buttons.LeftThumbstickUp))
-                {
-                    MyHero.Move(3 * 0, 3 * -1);
-                }
+                if (newPadState.IsButtonDown(Buttons.LeftThumbstickLeft) || newPadState.IsButtonDown(Buttons.DPadLeft))
+                    playerInput.Left = true;
+                if (newPadState.IsButtonDown(Buttons.LeftThumbstickDown) || newPadState.IsButtonDown(Buttons.DPadDown))
+                    playerInput.Down = true;
+                if (newPadState.IsButtonDown(Buttons.LeftThumbstickRight) || newPadState.IsButtonDown(Buttons.DPadRight))
+                    playerInput.Right = true;
+                if (newPadState.IsButtonDown(Buttons.LeftThumbstickUp) || newPadState.IsButtonDown(Buttons.DPadUp))
+                    playerInput.Up = true;
 
-
-                if (newPadState.IsButtonDown(Buttons.DPadLeft))
-                {
-                    MyHero.Move(3 * -1, 3 * 0);
-                }
-
-                if (newPadState.IsButtonDown(Buttons.DPadDown))
-                {
-                    MyHero.Move(3 * 0, 3 * 1);
-                }
-
-                if (newPadState.IsButtonDown(Buttons.DPadRight))
-                {
-
-                    MyHero.Move(3 * 1, 3 * 0);
-                }
-
-                if (newPadState.IsButtonDown(Buttons.DPadUp))
-                {
-                    MyHero.Move(3 * 0, 3 * -1);
-                }
 
                 if (newPadState.IsButtonDown(Buttons.A))
-                {
-                    Debug.WriteLine("Button A is Down");
-                }
+                    playerInput.A = true;
 
                 if (newPadState.IsButtonDown(Buttons.B) && !oldPadState.IsButtonDown(Buttons.B))
-                {
-                    Debug.WriteLine("Button B is down");
-                }
+                    playerInput.B = true;
 
                 oldPadState = newPadState;
             }
 
             //  Keyboard        
             KeyboardState newKBState = Keyboard.GetState();
-
-            // Move the ship
-            if ((newKBState.IsKeyDown(Keys.Left) || newKBState.IsKeyDown(Keys.A)) && MyHero.Position.X > 0)
-            {
-                MyHero.Move(3 * -1, 3 * 0);
-            }
-            if ((newKBState.IsKeyDown(Keys.Down) || newKBState.IsKeyDown(Keys.S)) && MyHero.Position.Y < World.Height - MyHero.Texture.Height)
-            {
-                MyHero.Move(3 * 0, 3 * 1);
-            }
-            if (newKBState.IsKeyDown(Keys.Right) || newKBState.IsKeyDown(Keys.D))
-            {
-                MyHero.Move(3 * 1, 3 * 0);
-            }
-            if ((newKBState.IsKeyDown(Keys.Up) || newKBState.IsKeyDown(Keys.W)) && MyHero.Position.Y > 0)
-            {
-                MyHero.Move(3 * 0, 3 * -1);
-            }
+            if ((newKBState.IsKeyDown(Keys.Left) || newKBState.IsKeyDown(Keys.A)))
+                playerInput.Left = true;
+            if ((newKBState.IsKeyDown(Keys.Down) || newKBState.IsKeyDown(Keys.S)))
+                playerInput.Down = true;
+            if ((newKBState.IsKeyDown(Keys.Right) || newKBState.IsKeyDown(Keys.D)))
+                playerInput.Right = true;
+            if ((newKBState.IsKeyDown(Keys.Up) || newKBState.IsKeyDown(Keys.W)))
+                playerInput.Up = true;
 
             if (newKBState.IsKeyDown(Keys.Space) && !oldKBState.IsKeyDown(Keys.Space))
             {
@@ -184,6 +163,44 @@ namespace BCEngine
             {
                 Debug.WriteLine("Fire !");
             }
+
+            // Handle inputs
+            if (playerInput.Up && MyHero.Position.Y > 0)
+            {
+                MyHero.Move(3 * 0, 3 * -1);
+            }
+            if (playerInput.Down && MyHero.Position.Y < World.Height - MyHero.Height)
+            {
+                MyHero.Move(3 * 0, 3 * 1);
+            }
+            if (playerInput.Left && MyHero.Position.X > 0)
+            {
+                MyHero.Move(3 * -1, 3 * 0);
+                MyHero.effect = SpriteEffects.FlipHorizontally;
+            }
+            if (playerInput.Right && MyHero.Position.X < World.Width - MyHero.Width)
+            {
+                MyHero.Move(3 * 1, 3 * 0);
+                MyHero.effect = SpriteEffects.None;
+            }
+            if (playerInput.A)
+            {
+
+            }
+            if (playerInput.B)
+            {
+
+            }
+            if (playerInput.X)
+            {
+
+            }
+            if (playerInput.Y)
+            {
+
+            }
+
+
 
 
             /**

@@ -24,7 +24,8 @@ namespace BCEngine
         {
             Screen = mainGame.Window.ClientBounds;
             AssetManager.LoadTexture2D(mainGame.Content,"button");
-            btnPlay = new Button(AssetManager.GetTexture2D("button"));
+            btnPlay = new Button();
+            btnPlay.Texture = AssetManager.GetTexture2D("button");
             btnPlay.Position = new Vector2(Screen.Width/2-btnPlay.Texture.Width/2,Screen.Height/2-btnPlay.Texture.Height/2);
             btnPlay.onClick = onClickPlay;
             listActor.Add(btnPlay);

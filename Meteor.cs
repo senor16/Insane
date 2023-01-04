@@ -4,7 +4,7 @@ namespace BCEngine
 {
     public class Meteor : Sprite
     {
-        public Meteor(Texture2D pTexture) : base(pTexture)
+        public Meteor() : base()
         {
             do
             {

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace BCEngine
@@ -12,7 +11,7 @@ namespace BCEngine
         public bool isHover { get; private set; }
         private MouseState oldMouseState;
         public OnClick onClick {get;set;}
-        public Button(Texture2D pTexture) : base(pTexture)
+        public Button() : base()
         {
             isHover = false;
             oldMouseState = Mouse.GetState();
