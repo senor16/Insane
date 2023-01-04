@@ -34,6 +34,7 @@ WASD, Arrow keys, Left thumstick => Move
 
 [https://Craftpix.net](https://Craftpix.net)
 
+### Build State : Build 2
 
 ### Development duration : 
 
