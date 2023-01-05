@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using TexturePackerLoader;
 
 namespace BCEngine
 {
@@ -15,8 +16,11 @@ namespace BCEngine
         private SoundEffect sfxExplode;
         private PlayerInput playerInput;
         private Rectangle World;
+        private SpriteSheetLoader spriteSheetLoader;
+        private SpriteSheet heroSpriteSheet;
 
         private Hero MyHero;
+
         private Texture2D Background;
 
 
@@ -32,46 +36,48 @@ namespace BCEngine
             World.Width = 1000;
             World.Height = mainGame.Screen.Height;
 
-            Debug.WriteLine("w : " + mainGame.Screen.Width + ", h : " + mainGame.Screen.Height);
             // Input state
             oldKBState = Keyboard.GetState();
             oldPadState = GamePad.GetState(PlayerIndex.One);
+            playerInput = new PlayerInput();
+
+            spriteSheetLoader = new SpriteSheetLoader(mainGame.Content, mainGame.GraphicsDevice);
+            heroSpriteSheet = spriteSheetLoader.Load("Robot 1.png");
 
             // Hero
             // Anim Idle
             Anim HeroIdle = new Anim("idle", 10, true);
             for (int i = 0; i < 9; i++)
             {
-                AssetManager.LoadTexture2D(mainGame.Content, "Robot_1/R1_Idle/idle_00" + i);
-                HeroIdle.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Idle/idle_00" + i));
+                HeroIdle.addFrame(heroSpriteSheet.Sprite("R1_Idle/idle_00" + i));
             }
 
             // Anim Run
-            Anim HeroRun = new Anim("Run", 10, true);
+            Anim HeroRun = new Anim("run", 10, true);
             for (int i = 0; i < 12; i++)
             {
                 if (i < 10)
                 {
-
-                    AssetManager.LoadTexture2D(mainGame.Content, "Robot_1/R1_Run/Run_00" + i);
-                    HeroRun.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Run/Run_00" + i));
+                    HeroRun.addFrame(heroSpriteSheet.Sprite("R1_Run/Run_00" + i));
                 }
                 else
                 {
-                    AssetManager.LoadTexture2D(mainGame.Content, "Robot_1/R1_Run/Run_0" + i);
-                    HeroRun.addFrame(AssetManager.GetTexture2D("Robot_1/R1_Run/Run_0" + i));
+                    HeroRun.addFrame(heroSpriteSheet.Sprite("R1_Run/Run_0" + i));
                 }
             }
 
 
             MyHero = new Hero();
-            MyHero.Height = AssetManager.GetTexture2D("Robot_1/R1_Run/Run_000").Height;
+
+            MyHero.Height = 150;
+
             MyHero.addAnim(HeroIdle);
             MyHero.addAnim(HeroRun);
-            MyHero.playAnim("idle");
+            MyHero.playAnim("run");
             MyHero.Position = new Vector2(40, mainGame.Screen.Height - MyHero.Height - 20);
+            Debug.WriteLine(MyHero.Position);
             listActor.Add(MyHero);
-            playerInput = new PlayerInput();
+
             // Meteors
             // AssetManager.LoadTexture2D(mainGame.Content, "meteor");
             // for (int i = 0; i < 10; i++)
@@ -165,24 +171,24 @@ namespace BCEngine
             }
 
             // Handle inputs
-            if (playerInput.Up && MyHero.Position.Y > 0)
-            {
-                MyHero.Move(3 * 0, 3 * -1);
-            }
-            if (playerInput.Down && MyHero.Position.Y < World.Height - MyHero.Height)
-            {
-                MyHero.Move(3 * 0, 3 * 1);
-            }
-            if (playerInput.Left && MyHero.Position.X > 0)
-            {
-                MyHero.Move(3 * -1, 3 * 0);
-                MyHero.effect = SpriteEffects.FlipHorizontally;
-            }
-            if (playerInput.Right && MyHero.Position.X < World.Width - MyHero.Width)
-            {
-                MyHero.Move(3 * 1, 3 * 0);
-                MyHero.effect = SpriteEffects.None;
-            }
+            // if (playerInput.Up && MyHero.Position.Y > 0)
+            // {
+            //     MyHero.Move(3 * 0, 3 * -1);
+            // }
+            // if (playerInput.Down && MyHero.Position.Y < World.Height - MyHero.Height)
+            // {
+            //     MyHero.Move(3 * 0, 3 * 1);
+            // }
+            // if (playerInput.Left && MyHero.Position.X > 0)
+            // {
+            //     MyHero.Move(3 * -1, 3 * 0);
+            //     MyHero.effect = SpriteEffects.FlipHorizontally;
+            // }
+            // if (playerInput.Right && MyHero.Position.X < World.Width - MyHero.Width)
+            // {
+            //     MyHero.Move(3 * 1, 3 * 0);
+            //     MyHero.effect = SpriteEffects.None;
+            // }
             if (playerInput.A)
             {
 
@@ -203,55 +209,55 @@ namespace BCEngine
 
 
 
-            /**
-                Meteors
-            */
-            foreach (IActor Actor in listActor)
-            {
-                if (Actor is Meteor m)
-                {
-                    if (m.Position.X < 0)
-                    {
-                        m.Position = new Vector2(0, m.Position.Y);
-                        m.vx = -m.vx;
-                    }
-                    if (m.Position.X > mainGame.Screen.Width - m.Texture.Width)
-                    {
-                        m.Position = new Vector2(mainGame.Screen.Width - m.Texture.Width, m.Position.Y);
-                        m.vx = -m.vx;
-                    }
-                    if (m.Position.Y < 0)
-                    {
-                        m.Position = new Vector2(m.Position.X, 0);
-                        m.vy = -m.vy;
+            // /**
+            //     Meteors
+            // */
+            // foreach (IActor Actor in listActor)
+            // {
+            //     if (Actor is Meteor m)
+            //     {
+            //         if (m.Position.X < 0)
+            //         {
+            //             m.Position = new Vector2(0, m.Position.Y);
+            //             m.vx = -m.vx;
+            //         }
+            //         if (m.Position.X > mainGame.Screen.Width - m.Texture.Width)
+            //         {
+            //             m.Position = new Vector2(mainGame.Screen.Width - m.Texture.Width, m.Position.Y);
+            //             m.vx = -m.vx;
+            //         }
+            //         if (m.Position.Y < 0)
+            //         {
+            //             m.Position = new Vector2(m.Position.X, 0);
+            //             m.vy = -m.vy;
 
-                    }
+            //         }
 
-                    if (m.Position.Y > mainGame.Screen.Height - m.Texture.Height)
-                    {
-                        m.Position = new Vector2(m.Position.X, mainGame.Screen.Height - m.Texture.Height);
-                        m.vy = -m.vy;
-                    }
-                    if (Util.CollideByBox(m, MyHero))
-                    {
-                        MyHero.TouchedBy(m);
-                        m.TouchedBy(MyHero);
-                        m.ToRemove = true;
-                        // sfxExplode.Play();
-                    }
-                }
-            }
+            //         if (m.Position.Y > mainGame.Screen.Height - m.Texture.Height)
+            //         {
+            //             m.Position = new Vector2(m.Position.X, mainGame.Screen.Height - m.Texture.Height);
+            //             m.vy = -m.vy;
+            //         }
+            //         if (Util.CollideByBox(m, MyHero))
+            //         {
+            //             MyHero.TouchedBy(m);
+            //             m.TouchedBy(MyHero);
+            //             m.ToRemove = true;
+            //             // sfxExplode.Play();
+            //         }
+            //     }
+            // }
 
             listActor.RemoveAll(item => item.ToRemove == true);
 
             /**
                 Ship
             */
-            if (MyHero.Energy <= 0)
-            {
-                MediaPlayer.Stop();
-                mainGame.gameState.changeScene(GameState.SceneType.Gameover);
-            }
+            // if (MyHero.Energy <= 0)
+            // {
+            //     MediaPlayer.Stop();
+            //     mainGame.gameState.changeScene(GameState.SceneType.Gameover);
+            // }
 
             oldKBState = newKBState;
             base.Update(gameTime);
@@ -262,7 +268,9 @@ namespace BCEngine
             // Debug.WriteLine("Drawing Scene Gameplay...");
             mainGame.spriteBatch.Begin();
             mainGame.spriteBatch.Draw(Background, Vector2.Zero, Color.White);
-            mainGame.spriteBatch.DrawString(AssetManager.MainFont, "Ship Energy : " + MyHero.Energy, new Vector2(20, 50), Color.Wheat);
+
+
+            // mainGame.spriteBatch.DrawString(AssetManager.MainFont, "Ship Energy : " + MyHero.Energy, new Vector2(20, 50), Color.Wheat);
             mainGame.spriteBatch.DrawString(AssetManager.MainFont, "This is the Gameplay", new Vector2(100, 10), Color.Red);
 
             mainGame.spriteBatch.End();

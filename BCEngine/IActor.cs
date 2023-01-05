@@ -1,6 +1,7 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TexturePackerLoader;
 
 namespace BCEngine{
     public interface IActor{
@@ -10,7 +11,7 @@ namespace BCEngine{
         bool ToRemove {get;set;}
 
         void Update(GameTime gameTime);
-        void Draw(SpriteBatch pSpriteBatch);
+        void Draw(SpriteBatch pSpriteBatch, SpriteRender pSpriteRenderer);
 
         void TouchedBy(IActor pBy);
         

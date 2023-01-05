@@ -1,5 +1,6 @@
 namespace BCEngine;
 using Microsoft.Xna.Framework.Graphics;
+using TexturePackerLoader;
 
 public class Hero : Sprite{
     public int Energy;
@@ -17,8 +18,8 @@ public class Hero : Sprite{
 
     
 
-    public override void Draw(SpriteBatch pSpriteBatch)
+    public override void Draw(SpriteBatch pSpriteBatch, SpriteRender pSpriteRenderer)
     {
-        base.Draw(pSpriteBatch);
+        base.Draw(pSpriteBatch,pSpriteRenderer);
     }
 }

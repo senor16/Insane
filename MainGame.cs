@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TexturePackerLoader;
 
 namespace BCEngine;
 
@@ -8,6 +9,8 @@ public class MainGame : Game
 {
     GraphicsDeviceManager graphics;
     public SpriteBatch spriteBatch;
+    
+    public SpriteRender spriteRender;
     public GameState gameState;
     public Rectangle Screen;
 
@@ -38,6 +41,7 @@ public class MainGame : Game
     protected override void LoadContent()
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
+        spriteRender = new SpriteRender(spriteBatch);
 
         // TODO: use this.Content to load your game content here
         AssetManager.Load(Content);

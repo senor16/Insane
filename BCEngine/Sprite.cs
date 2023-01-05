@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TexturePackerLoader;
 
 namespace BCEngine;
 
@@ -44,14 +45,14 @@ public class Sprite : IActor
         if (currentAnim != null)
         {
             currentAnim.Update();
-            if (Width != currentAnim.frames[currentAnim.currentFrame].Width)
-                Width = currentAnim.frames[currentAnim.currentFrame].Width;
+            // if (Width != currentAnim.frames[currentAnim.currentFrame].Width)
+            //     Width = currentAnim.frames[currentAnim.currentFrame].Width;
 
-            if (Height != currentAnim.frames[currentAnim.currentFrame].Height)
-                Height = currentAnim.frames[currentAnim.currentFrame].Height;
+            // if (Height != currentAnim.frames[currentAnim.currentFrame].Height)
+            //     Height = currentAnim.frames[currentAnim.currentFrame].Height;
 
         }
-        else
+        else if (Texture!= null)
         {
             Width = Texture.Width;
             Height = Texture.Height;
@@ -61,14 +62,15 @@ public class Sprite : IActor
 
     }
 
-    public virtual void Draw(SpriteBatch pSpriteBatch)
+    public virtual void Draw(SpriteBatch pSpriteBatch, SpriteRender pSpriteRenderer)
     {
         pSpriteBatch.Begin();
-        if (currentAnim == null)
+        if (Texture!= null)
             pSpriteBatch.Draw(Texture, Position, Color.White);
-        else
+        else if(currentAnim != null)
         {
-            pSpriteBatch.Draw(currentAnim.frames[currentAnim.currentFrame], Position, null, Color.White, 0, Vector2.Zero, 1.0f, effect, 0);
+            pSpriteRenderer.Draw(currentAnim.frames[currentAnim.currentFrame], Position, Color.White,0,1,effect);            
+            // pSpriteBatch.Draw(, Position, null, Color.White, 0, Vector2.Zero, 1.0f, effect, 0);
         }
         pSpriteBatch.End();
     }

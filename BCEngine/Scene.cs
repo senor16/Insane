@@ -33,7 +33,7 @@ namespace BCEngine
         {
             // Debug.WriteLine("Drawing Scene...");
             foreach(IActor actor in listActor){
-                actor.Draw(mainGame.spriteBatch);
+                actor.Draw(mainGame.spriteBatch,mainGame.spriteRender);
             }
 
         }
